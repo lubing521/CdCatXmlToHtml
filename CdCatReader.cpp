@@ -1,7 +1,7 @@
 // CdCatReader.cpp - IReader implementation for parsing CD catalogues.
 #include <QString>
 #include <QXmlStreamReader>
-#include <QTextOStream>
+#include <QTextStream>
 #include <QFile>
 #include "HtmlWriter.h"
 #include "CdCatReader.h"

@@ -53,6 +53,7 @@ protected:
 private:
 	bool fitsBuffer();
 	CdCatReader( CdCatReader& ); // for now restrict copying and other stuff
+	CdCatReader& operator = ( CdCatReader&);
 	void TODO_FUNC(); //debug purposes;
 };
 

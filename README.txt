@@ -14,3 +14,4 @@ Key modules are CdCatTranslator and HtmlWriter
 
 CdCatTranslator reads XML data from file (utilizing QXmlStreamReader) and calls HtmlWriter to write the output. 
 HtmlWriter writes the html tags and values into specified output (file in our case).
+The logic of HtmlWrite also partially illustrated in output_mockup.html file (see comments there).

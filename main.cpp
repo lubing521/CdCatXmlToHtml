@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     QFile file(fileName);
 	if ( file.open(QFile::ReadOnly | QFile::Text) )
 		reader->read(&file);
-	
+	delete reader;
 	return 0;
 
 }

@@ -1,4 +1,5 @@
 // CdCatReader.cpp - IReader implementation for parsing CD catalogues.
+#include <vector>
 #include <QString>
 #include <QXmlStreamReader>
 #include <QTextStream>
@@ -19,9 +20,12 @@ void TODO_FUNC(int )
 qDebug() << __FILE__ << ": " << __LINE__ << "Replace this with a proper func";
 }
 
-CdCatReader::CdCatReader(void)
+const QString tags[] = {"TITLE","ARTIST","COMPANY", "COUNTRY", "PRICE", "YEAR"};
+std::vector<QString> vtags (tags, tags + (sizeof tags / sizeof tags[0]));
+
+CdCatReader::CdCatReader(void) 
 {
-	_htmlText = QSharedPointer<QString>( new QString(BufferSize, '\0'));
+//	_htmlText = QSharedPointer<QString>( new QString(BufferSize, '\0'));
 	_xml = new QXmlStreamReader();	
 	// Most desktop operating systems overcommit memory. This means that malloc() or operator new return a valid pointer,
 	//	even though there is not enough memory available at allocation time. On such systems, no exception of type std::bad_alloc is thrown. - Qt4 doc
@@ -34,11 +38,14 @@ CdCatReader::CdCatReader(void)
 	//	<PRICE>9.80</PRICE>
 	//	<YEAR>1970</YEAR>
 	//</CD>
-	
 	// init the map of parsing functions 
 	//QStringRef title = ;
-	// all except "CD" would have one function
-	_nodeNameToFunc[new QString("TITLE")] = &CdCatReader::readTitle;
+
+	//std::vector Foo::MyVector(a, a + (sizeof a / sizeof a[0]));
+
+	// so far all except "CD" would have one function
+	_nodeNameToFunc[new QString("CD")] = &CdCatReader::readCD;
+	_nodeNameToFunc[new QString("TITLE")] = &CdCatReader::readField;
 	_nodeNameToFunc[new QString("ARTIST")] = &CdCatReader::TODO_FUNC;
 	_nodeNameToFunc[new QString("COMPANY")] = &CdCatReader::TODO_FUNC;
 	_nodeNameToFunc[new QString("PRICE")] = &CdCatReader::TODO_FUNC;
@@ -74,75 +81,72 @@ bool CdCatReader::fitsBuffer()
 
 void CdCatReader::read(QIODevice *device)
 {
+	bool began = false;
 	_xml->setDevice(device);
+
 	 while (_xml->readNextStartElement())
 	 {
         if (_xml->name() == rootElementName ) //check whether it's our file
 		{
-			_writer->MakeBeginTable();
-            readCdCat(); //start processing
+			_writer->BeginDoc();
+			began = true;
+            findCDs(); //start processing
 		}
         else
-            _xml->raiseError(QObject::tr("The file is not an CD Catalog file."));
+			_xml->skipCurrentElement();
 	 }
-	 _writer->MakeEndTable();
-	 qDebug() << _xml->error();
+	 if (!began)
+		 _xml->raiseError(QObject::tr("The file is not an CD Catalog file."));
+	 else
+		 _writer->EndDoc();	 
+	 qDebug() <<  _xml->errorString();
 }
 
-void CdCatReader::readCdCat()
+void CdCatReader::findCDs()
 {
-	while (_xml->readNextStartElement()) {
-
-        if (_xml->name() == "CD")
-            readCD();
-        else
-            _xml->skipCurrentElement();
-    }
+	while (_xml->readNextStartElement()) // read every cd and skip all in between
+        _xml->name() == "CD" ? readCD() : _xml->skipCurrentElement();
 }
 void CdCatReader::readCD()
 {
 	Q_ASSERT(_xml->name() == "CD"); 
 	
-	{ // protect iterator from being used by smth else
-		std::map<QStringRef, CdCatFunction>::iterator it;
-		while (_xml->readNextStartElement())
+	{ 
+		_writer->CdHead();
+		
+		while (_xml->readNextStartElement()) // raead fields (artist, album...)
 		{
+			if(std::find(vtags.begin(), vtags.end(), _xml->name().toString()) != vtags.end()) 
+				_writer->Field(_xml->name(), _xml->readElementText()); 
+			else
+				_xml->skipCurrentElement();
 			//it = _nodeNameToFunc.find(_xml->name());
-			//it == _nodeNameToFunc.end() ? _xml->skipCurrentElement() : (this->*(it->second))(); // skip or call an appropriate processing function
-			//_writer->Field(_xml->name(), 
+			//it == _nodeNameToFunc.end() ? _xml->skipCurrentElement() : (this->*(it->second))(); // skip or call an appropriate processing function	
 		}
+		_writer->CdTail();
 	}
 }
 
 
-void CdCatReader::readTitle()
+void CdCatReader::readField()
 {
-	_writer->MakeHtmlCDElementRow(_xml->readElementText());
+	_writer->Field(_xml->name(), _xml->readElementText());
+	//_writer->MakeHtmlCDElementRow(_xml->readElementText());
 }
-void CdCatReader::readArtist()
-{
-}
-void CdCatReader::readCompany()
-{
-}
-void CdCatReader::readPrice()
-{
-}
-void CdCatReader::readYear()
-{
-}
+//void CdCatReader::readArtist()
+//{
+//}
+//void CdCatReader::readCompany()
+//{
+//}
+//void CdCatReader::readPrice()
+//{
+//}
+//void CdCatReader::readYear()
+//{
+//}
 
-
-QSharedPointer<QString> CdCatReader::htmlText() const
-{
-	return _htmlText;
-}
-
-bool CdCatReader::isFull() const
-{
-	return _isFull;
-}
-	
 CdCatReader::~CdCatReader(void)
 {
+//	_output->flush();
 }

@@ -1,7 +1,7 @@
 #include "HtmlWriter.h"
 
 
-HtmlWriter::HtmlWriter(QSharedPointer<QTextStream> stream) : _stream(stream)
+HtmlWriter::HtmlWriter(QSharedPointer<QTextStream> stream) : _stream(stream), _cdNumber(1)
 {
 }
 
@@ -33,11 +33,11 @@ void HtmlWriter::CdHead()
 {
 	(*_stream.data()) <<
         "<tr>\
-            <td> nbsp; CD " <<
+            <td> CD " <<
                 _cdNumber++ <<
             "</td>\
             <td>\
-                <table border=\"1\" style=\"width: 100%;\">";
+                <table border=\"1\" >";
 }
 void HtmlWriter::CdTail()
 {
@@ -46,14 +46,14 @@ void HtmlWriter::CdTail()
             </td>\
         </tr>";
 }
-void HtmlWriter::Field(const QString& tagName, const QString& value)
+void HtmlWriter::Field(const QStringRef tagName, const QString& value)
 {
 	(*_stream.data()) <<
 	"<tr>\
 	<td>" <<
-		tagName <<
+		tagName.toString() <<
 		"</td>\
-		<td>" <<
+		<td style=\"width: 100%;\">" <<
 		value <<
 		"</td>\
 		</tr>";

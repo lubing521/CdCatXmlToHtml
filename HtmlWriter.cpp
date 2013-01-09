@@ -1,17 +1,16 @@
 #include "HtmlWriter.h"
 
-
 HtmlWriter::HtmlWriter(QSharedPointer<QTextStream> stream) : _stream(stream), _cdNumber(1)
 {
 }
 
-
 HtmlWriter::~HtmlWriter(void)
 {
 }
+
 void HtmlWriter::BeginDoc()
 {
-	// would be correct XHMTML 1.0 document
+	// would be a correct XHMTML 1.0 document
 	(*_stream.data()) <<
 		"<html>\
 		<head>\
@@ -22,6 +21,7 @@ void HtmlWriter::BeginDoc()
 		<body>\
 		<table style=\"width: 100%;\" border=\"1\">";
 }
+
 void HtmlWriter::EndDoc()
 {
 	(*_stream.data()) <<
@@ -29,28 +29,31 @@ void HtmlWriter::EndDoc()
 		</body>\
 		</html>";
 }
+
 void HtmlWriter::CdHead()
 {
 	(*_stream.data()) <<
-        "<tr>\
-            <td> CD " <<
-                _cdNumber++ <<
-            "</td>\
-            <td>\
-                <table border=\"1\" >";
+		"<tr>\
+		<td> CD " <<
+		_cdNumber++ <<
+		"</td>\
+		<td>\
+		<table border=\"1\" >";
 }
+
 void HtmlWriter::CdTail()
 {
 	(*_stream.data()) <<
 		"</table>\
-            </td>\
-        </tr>";
+		</td>\
+		</tr>";
 }
+
 void HtmlWriter::Field(const QStringRef tagName, const QString& value)
 {
 	(*_stream.data()) <<
-	"<tr>\
-	<td>" <<
+		"<tr>\
+		<td>" <<
 		tagName.toString() <<
 		"</td>\
 		<td style=\"width: 100%;\">" <<

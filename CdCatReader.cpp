@@ -37,6 +37,7 @@ CdCatReader::CdCatReader(void)
 	
 	// init the map of parsing functions 
 	//QStringRef title = ;
+	// all except "CD" would have one function
 	_nodeNameToFunc[new QString("TITLE")] = &CdCatReader::readTitle;
 	_nodeNameToFunc[new QString("ARTIST")] = &CdCatReader::TODO_FUNC;
 	_nodeNameToFunc[new QString("COMPANY")] = &CdCatReader::TODO_FUNC;
@@ -106,8 +107,9 @@ void CdCatReader::readCD()
 		std::map<QStringRef, CdCatFunction>::iterator it;
 		while (_xml->readNextStartElement())
 		{
-			it = _nodeNameToFunc.find(_xml->name());
-			it == _nodeNameToFunc.end() ? _xml->skipCurrentElement() : (this->*(it->second))(); // skip or call an appropriate processing function
+			//it = _nodeNameToFunc.find(_xml->name());
+			//it == _nodeNameToFunc.end() ? _xml->skipCurrentElement() : (this->*(it->second))(); // skip or call an appropriate processing function
+			//_writer->Field(_xml->name(), 
 		}
 	}
 }

@@ -15,16 +15,15 @@ public:
 		row.append("</tr>");
 		(*_stream.data()) << row;
 	}
-	void  MakeBeginTable()
-	{
-		(*_stream.data()) << "<table>";
-	}
-	void MakeEndTable()
-	{
-		(*_stream.data()) << "</table>";
-	}
+	void BeginDoc();
+	void EndDoc();
+	void CdHead();
+	void CdTail();
+	void Field(const QString& tagName, const QString& value);
+
 	~HtmlWriter(void);
 private:
 	QSharedPointer<QTextStream> _stream;
+	qint64 _cdNumber;
 };
 
